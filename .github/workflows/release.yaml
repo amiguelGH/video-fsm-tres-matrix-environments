@@ -38,16 +38,9 @@ jobs:
         run: tar czf build.tar.gz build
             
       - name: Create Release
-        working-directory: .github # in .github dir
+        working-directory: .github # in .github dir        
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}          
-        run: |
-          OUTPUT=$(npx semantic-release)
-          echo $OUTPUT
-          if [[ $OUTPUT == *"There are no relevant changes, so no new version is released."* ]]; then
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
-          fi
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
       
