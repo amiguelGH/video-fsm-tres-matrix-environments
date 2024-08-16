@@ -1,0 +1,21 @@
+name: Node.js CI - reutilizando accion-simple-compuesta
+
+on:
+  workflow_dispatch:
+
+jobs:
+  version-matrix:
+    strategy:
+      # super important if you want to see all results, even if one fails
+      # fail-fast is true by default
+      fail-fast: false
+      matrix:
+        version: [10, 12, 14, 16, 20]
+        sistema-operativo: [github-pages]
+      max-parallel: 1
+    uses: amiguelGH/video-fsm-tres-matrix-actions-reusables/.github/workflows/deploy-action-simple.yml@main
+    #with:
+    #  version-so: ${{ matrix.version }}
+    #  sistema-operativo: "ubuntu-latest"
+    #  nombre-archivo: ${{ matrix.sistema-operativo }}
+    secrets: inherit

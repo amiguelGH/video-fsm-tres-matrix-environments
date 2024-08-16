@@ -1,0 +1,94 @@
+name: Build, Release, Deploy
+on:
+  push:
+    branches:
+      - dev
+      - qa
+      - prod
+jobs:
+      
+  build-and-save-dev:
+    
+    runs-on: ubuntu-latest
+      
+    if: github.ref == 'refs/heads/dev'
+    steps:
+
+     
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: yarn
+          cache-dependency-path: ./yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create Build Files
+        run: yarn run build-static
+      
+      - name: Save Raw Build # save build as workflow artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: raw_build
+          path: build
+
+  release-dev:
+    if: github.ref == 'refs/heads/dev'
+    needs: build-and-save-dev
+    uses: ./.github/workflows/release.yaml
+  
+  fetch-build-qa:
+    if: github.ref == 'refs/heads/qa'
+    uses: ./.github/workflows/fetch-build.yaml
+    with:
+      FETCH_FROM: dev
+  
+  fetch-build-prod:
+    if: github.ref == 'refs/heads/prod'
+    uses: ./.github/workflows/fetch-build.yaml
+    with:
+      FETCH_FROM: qa
+
+  release-qa:
+    if: github.ref == 'refs/heads/qa'
+    needs: fetch-build-qa
+    uses: ./.github/workflows/release.yaml
+
+  release-prod:
+    if: github.ref == 'refs/heads/prod'
+    needs: fetch-build-prod
+    uses: ./.github/workflows/release.yaml
+
+  inject-deploy-dev:
+    if: github.ref == 'refs/heads/dev' && ${{ needs.release-internal.outputs.deploy }}
+    uses: ./.github/workflows/deploy.yaml
+    needs: release-dev
+    with:
+      DEPLOY_ENV: ${{ github.ref_name }}
+      S3_BUCKET: s3://build-once-deploy-many-${{ github.ref_name }}
+    secrets: inherit
+  
+  inject-deploy-qa:
+    if: github.ref == 'refs/heads/qa' && ${{ needs.release-internal.outputs.deploy }}
+    uses: ./.github/workflows/deploy.yaml
+    needs: release-qa
+    with:
+      DEPLOY_ENV: ${{ github.ref_name }}
+      S3_BUCKET: s3://build-once-deploy-many-${{ github.ref_name }}
+    secrets: inherit
+
+  inject-deploy-prod:
+    if: github.ref == 'refs/heads/prod' && ${{ needs.release-internal.outputs.deploy }}
+    uses: ./.github/workflows/deploy.yaml
+    needs: release-prod
+    with:
+      DEPLOY_ENV: ${{ github.ref_name }}
+      S3_BUCKET: s3://build-once-deploy-many-${{ github.ref_name }}
+    secrets: inherit
