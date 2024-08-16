@@ -4,7 +4,13 @@ name: Trigger Release
 
 on:
   workflow_call
+  
+permissions:
+  id-token: write
+  contents: read
+  pages: write
 
+  
 jobs:
   release:
     runs-on: ubuntu-latest
