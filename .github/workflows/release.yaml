@@ -4,7 +4,15 @@ name: Trigger Release
 
 on:
   workflow_call
+  
+permissions:
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+  id-token: write # to enable use of OIDC for npm provenance
+  attestations: write
 
+  
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -38,16 +46,9 @@ jobs:
         run: tar czf build.tar.gz build
             
       - name: Create Release
-        working-directory: .github # in .github dir
+        working-directory: .github # in .github dir        
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}          
-        run: |
-          OUTPUT=$(npx semantic-release)
-          echo $OUTPUT
-          if [[ $OUTPUT == *"There are no relevant changes, so no new version is released."* ]]; then
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
-          fi
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npx semantic-release
       
