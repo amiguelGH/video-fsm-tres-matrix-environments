@@ -45,10 +45,13 @@ jobs:
         working-directory: .github # in .github dir
         run: tar czf build.tar.gz build
             
-      - name: Create Release
-        working-directory: .github # in .github dir        
+      - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+          tag: ${{ github.ref_name }}
+        run: |
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="${tag#v}" \
+              --generate-notes
       
