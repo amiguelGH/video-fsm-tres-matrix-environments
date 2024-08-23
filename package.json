@@ -1,5 +1,5 @@
 {
-  "homepage": "https://miguelGH.github.io/video-fsm-tres-matrix-environments",
+  "homepage": "https://amiguelGH.github.io/video-fsm-tres-matrix-environments",
   "name": "video-fsm-tres-matrix-environments",
   "version": "0.1.0",
   "private": true,
@@ -59,7 +59,7 @@
       "qa",
       "prod"
     ],
-    "repositoryUrl": "https://github.com/miguelGH/video-fsm-tres-matrix-environments.git",
+    "repositoryUrl": "https://github.com/amiguelGH/video-fsm-tres-matrix-environments.git",
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
