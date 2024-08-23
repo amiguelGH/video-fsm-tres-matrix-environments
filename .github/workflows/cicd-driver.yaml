@@ -6,8 +6,7 @@ on:
       - qa
       - prod
 
-
-      
+    
 jobs:
       
   build-and-save-dev:
