@@ -3,7 +3,7 @@
 name: Trigger Release
 
 on:
-  workflow_call
+  workflow_dispatch
   
 permissions:
   contents: write # to be able to publish a GitHub release
